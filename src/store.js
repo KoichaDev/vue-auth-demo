@@ -34,7 +34,6 @@ export default new Vuex.Store({
       console.log(expiredTimeInSeconds);
 
       setTimeout(() => {
-        console.log(expiredTimeInSeconds)
         commit('clearAuthData');
       }, expiredTimeInSeconds);
     },
@@ -46,12 +45,22 @@ export default new Vuex.Store({
           returnSecureToken: true,
         })
         .then((res) => {
+          const idToken = res.data.idToken;
+          const expiresIn = res.data.expiresIn;
           console.log(res);
 
           commit('authUser', {
             token: res.data.idToken,
             userId: res.data.localId,
           });
+
+          const now = new Date();
+          /* Converting the expiration time from milliseconds to seconds. */
+          const expirationDate = new Date(now.getTime() + expiresIn * 10000);
+
+          localStorage.setItem('token', idToken);
+          localStorage.setItem('expiresIn', expirationDate);
+
           dispatch('storeUser', authData);
         })
         .catch((error) => console.log(error));
@@ -65,15 +74,23 @@ export default new Vuex.Store({
         })
         .then((res) => {
           console.log(res);
-          const expiresTime = res.data.expiresIn;
+          const idToken = res.data.idToken;
+          const expiresIn = res.data.expiresIn;
 
           commit('authUser', {
             token: res.data.idToken,
             userId: res.data.localId,
           });
 
+          const now = new Date();
+          /* Converting the expiration time from milliseconds to seconds. */
+          const expirationDate = new Date(now.getTime() + expiresIn * 10000);
+
+          localStorage.setItem('token', idToken);
+          localStorage.setItem('expiresIn', expirationDate);
+
           dispatch('storeUser', authData);
-          dispatch('setLogoutTimer', expiresTime);
+          dispatch('setLogoutTimer', expiresIn);
         })
         .catch((error) => console.log(error));
     },
