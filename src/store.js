@@ -19,8 +19,15 @@ export default new Vuex.Store({
     storeUser(state, user) {
       state.user = user;
     },
+    clearAuthData(state) {
+      state.idToken = null;
+      state.userId = null;
+    },
   },
   actions: {
+    logout({ commit }) {
+      commit('clearAuthData');
+    },
     signup({ commit, dispatch }, authData) {
       axios
         .post('/accounts:signUp?key=AIzaSyDSpDt8AsbkNg4tozrlQgzGeGL2rPt2V8s', {
@@ -86,6 +93,9 @@ export default new Vuex.Store({
   getters: {
     user(state) {
       return state.user;
+    },
+    isAuthenticated(state) {
+      return state.idToken !== null;
     },
   },
 });
